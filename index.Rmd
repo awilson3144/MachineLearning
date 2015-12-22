@@ -5,16 +5,30 @@ date: "Tuesday, December 22, 2015"
 output: html_document
 ---
 
-This is a sample document, to illustrate diplay page of 'gh-pages' website.  Testing that the page is built successfully again. Recommitting.
+#Summary
+The intent of this report is to provide a reproducible method of predicting the performance quality of different exercises based on data collected by accelerometers.  The analysis will be conducted using cross validation techniques to determine a machine learning algorithm with which to build a prediction model.
+
+#Getting Started
+The analyis in this study will rely on certain packages that will need to be installed and loaded into R.
+```{r}
+library(caret)
+```
+To ensure consistent results, set the following seed in R:
+```{r}
+set.seed(1334)
+```
+Both training and test sets for this analysis can be accessed and loaded into memory using the following URLs:
+```{r}
+trainUrl <- "http://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv"
+testUrl <- "http://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv"
+training <- read.csv(url(trainUrl), na.strings=c("NA","#DIV/0!",""))
+testing <- read.csv(url(testUrl), na.strings=c("NA","#DIV/0!",""))
+```
+Training dataset is further separated out into a training subset for building the model, and a testing subset.
 
 ```{r}
-summary(cars)
+inTrain<-createDataPartition(training$classe,p=.6, list=FALSE)
+subTrain<-training[inTrain,]
+subTest<-training[-inTrain,]
 ```
 
-You can also embed plots, for example:
-
-```{r, echo=FALSE}
-plot(cars)
-```
-
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
