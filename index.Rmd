@@ -5,7 +5,7 @@ date: "Tuesday, December 22, 2015"
 output: html_document
 ---
 
-This is a sample document, to illustrate diplay page of 'gh-pages' website.  Testing that the page is built successfully again.
+This is a sample document, to illustrate diplay page of 'gh-pages' website.  Testing that the page is built successfully again. Recommitting.
 
 ```{r}
 summary(cars)
