@@ -91,6 +91,30 @@ testing &lt;- read.csv(url(testUrl), na.strings=c(&quot;NA&quot;,&quot;#DIV/0!&q
 subTrain&lt;-training[inTrain,]
 subTest&lt;-training[-inTrain,]</code></pre>
 </div>
+<div id="exploratory-analysis-and-data-cleaning" class="section level1">
+<h1>Exploratory Analysis and Data Cleaning</h1>
+<p>This section is mainly concerned with removing unecessary variables that will interfere with the prediction model. First variables with near zero variance are detected and removed:</p>
+<pre class="r"><code>nearZero&lt;-nearZeroVar(subTrain,saveMetrics =TRUE)
+nearZeroVars&lt;-row.names(nearZero[which(nearZero$nzv=='TRUE'),])
+remove&lt;-names(subTrain) %in% nearZeroVars
+subTrain&lt;-subTrain[!remove]</code></pre>
+<p>The data has some sparse fields that are heavily populated with NA values. These will be removed to try and cut down on noise in the prediction.</p>
+<pre class="r"><code>remove2&lt;-colSums(is.na(subTrain)) &gt; 5000
+subTrain&lt;-subTrain[!remove2]</code></pre>
+<p>To further simplify the prediction model, all columns not related to acceleremoter data will be removed.</p>
+<pre class="r"><code>remove3&lt;-c(&quot;X&quot;,&quot;user_name&quot;, &quot;raw_timestamp_part_1&quot;, &quot;raw_timestamp_part_2&quot;, &quot;cvtd_timestamp&quot;,&quot;num_window&quot;)
+remove3&lt;-names(subTrain) %in% remove3
+subTrain&lt;-subTrain[!remove3]</code></pre>
+<p>The same subTest and testing datasets will then need to be processed with the same columns removed. It is important to note that the testing dataset does not include the output “classe” variable so it will need to be removed from the column names used to subset this dataset.</p>
+<pre class="r"><code>colName&lt;-colnames(subTrain)
+colName2&lt;-colnames(subTrain[,-53])
+subTest&lt;-subTest[colName]
+testing&lt;-testing[colName2]</code></pre>
+<div id="random-forest-prediction-algorithm" class="section level2">
+<h2>Random Forest Prediction Algorithm</h2>
+<p>To predict the “classe” variable I will use a Random Forest algorithm.</p>
+</div>
+</div>
 
 
 </div>

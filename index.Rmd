@@ -32,3 +32,41 @@ subTrain<-training[inTrain,]
 subTest<-training[-inTrain,]
 ```
 
+#Exploratory Analysis and Data Cleaning
+This section is mainly concerned with removing unecessary variables that will interfere with the prediction model.  First variables with near zero variance are detected and removed:
+```{r}
+nearZero<-nearZeroVar(subTrain,saveMetrics =TRUE)
+nearZeroVars<-row.names(nearZero[which(nearZero$nzv=='TRUE'),])
+remove<-names(subTrain) %in% nearZeroVars
+subTrain<-subTrain[!remove]
+```
+
+The data has some sparse fields that are heavily populated with NA values.  These will be removed to try and cut down on noise in the prediction.
+
+```{r}
+remove2<-colSums(is.na(subTrain)) > 5000
+subTrain<-subTrain[!remove2]
+```
+ 
+To further simplify the prediction model,  all columns not related to acceleremoter data will be removed.
+```{r}
+remove3<-c("X","user_name", "raw_timestamp_part_1", "raw_timestamp_part_2", "cvtd_timestamp","num_window")
+remove3<-names(subTrain) %in% remove3
+subTrain<-subTrain[!remove3]
+```
+
+The same subTest and testing datasets will then need to be processed with the same columns removed. It is important to note that the testing dataset does not include the output "classe" variable so it will need to be removed from the column names used to subset this dataset.
+
+```{r}
+colName<-colnames(subTrain)
+colName2<-colnames(subTrain[,-53])
+subTest<-subTest[colName]
+testing<-testing[colName2]
+```
+
+##Random Forest Prediction Algorithm
+To predict the "classe" variable I will use a Random Forest algorithm.
+
+
+
+
