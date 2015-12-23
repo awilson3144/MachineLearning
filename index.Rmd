@@ -12,6 +12,7 @@ The intent of this report is to provide a reproducible method of predicting the 
 The analyis in this study will rely on certain packages that will need to be installed and loaded into R.
 ```{r}
 library(caret)
+library(randomForest)
 ```
 To ensure consistent results, set the following seed in R:
 ```{r}
@@ -24,7 +25,7 @@ testUrl <- "http://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv"
 training <- read.csv(url(trainUrl), na.strings=c("NA","#DIV/0!",""))
 testing <- read.csv(url(testUrl), na.strings=c("NA","#DIV/0!",""))
 ```
-Training dataset is further separated out into a training subset for building the model, and a testing subset.
+Training dataset is further separated so that 60% of the sample will be used to build the model and then we can cross validate with the remaining 40% of the data in order to estimate the out of sample accuracy.
 
 ```{r}
 inTrain<-createDataPartition(training$classe,p=.6, list=FALSE)
@@ -64,9 +65,32 @@ subTest<-subTest[colName]
 testing<-testing[colName2]
 ```
 
-##Random Forest Prediction Algorithm
+##Random Forest Model and Cross Validation
 To predict the "classe" variable I will use a Random Forest algorithm.
+```{r}
+modelFit<-randomForest(classe~.,data=subTrain)
+```
+Now create predictions for our in-sample test set and cross validate against the real values using the confusionMatrix function:
 
+```{r}
+prediction<-predict(modelFit,subTest,type="class")
+confusionMatrix(prediction,subTest$classe)
+```
 
+##Conclusions and Out of Sample Error
+As the statistics show this appears to be a highly accurate model.  Based on the results of cross validation, an accuracy of 99% is expected when we test this against the out of sample data in the second part of this project.  Files to submit for testing out of sample can be created with the following code:
 
+```{r}
+predictionOS<-predict(modelFit,testing,type="class")
+pml_write_files = function(x){
+  n = length(x)
+  for(i in 1:n){
+    filename = paste0("problem_id_",i,".txt")
+    write.table(x[i],file=filename,quote=FALSE,row.names=FALSE,col.names=FALSE)
+  }
+}
+
+pml_write_files(predictionOS)
+
+```
 
